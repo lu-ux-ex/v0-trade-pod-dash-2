@@ -66,6 +66,7 @@ interface Event {
   is_published: boolean
   visible_to_members: boolean
   visible_to_partners: boolean
+  visible_to_directory_members: boolean  // ADD THIS LINE
   created_at: string
 }
 
@@ -161,6 +162,7 @@ export default function ContentManagerPage() {
     is_published: true,
     visible_to_members: true,
     visible_to_partners: false,
+    visible_to_directory_members: false,
   })
   
   const [resourceForm, setResourceForm] = useState({
@@ -1045,29 +1047,36 @@ export default function ContentManagerPage() {
                       <p className="text-xs text-muted-foreground">Current image will be kept</p>
                     )}
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Visible to Members</Label>
-                      <Switch
-                        checked={eventForm.visible_to_members}
-                        onCheckedChange={(checked) => setEventForm({ ...eventForm, visible_to_members: checked })}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Visible to Partners</Label>
-                      <Switch
-                        checked={eventForm.visible_to_partners}
-                        onCheckedChange={(checked) => setEventForm({ ...eventForm, visible_to_partners: checked })}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Published</Label>
-                      <Switch
-                        checked={eventForm.is_published}
-                        onCheckedChange={(checked) => setEventForm({ ...eventForm, is_published: checked })}
-                      />
-                    </div>
-                  </div>
+<div className="space-y-3">
+  <div className="flex items-center justify-between">
+    <Label>Visible to Members</Label>
+    <Switch
+      checked={eventForm.visible_to_members}
+      onCheckedChange={(checked) => setEventForm({ ...eventForm, visible_to_members: checked })}
+    />
+  </div>
+  <div className="flex items-center justify-between">
+    <Label>Visible to Partners</Label>
+    <Switch
+      checked={eventForm.visible_to_partners}
+      onCheckedChange={(checked) => setEventForm({ ...eventForm, visible_to_partners: checked })}
+    />
+  </div>
+  <div className="flex items-center justify-between">
+    <Label>Visible to Free Members</Label>
+    <Switch
+      checked={eventForm.visible_to_directory_members}
+      onCheckedChange={(checked) => setEventForm({ ...eventForm, visible_to_directory_members: checked })}
+    />
+  </div>
+  <div className="flex items-center justify-between">
+    <Label>Published</Label>
+    <Switch
+      checked={eventForm.is_published}
+      onCheckedChange={(checked) => setEventForm({ ...eventForm, is_published: checked })}
+    />
+  </div>
+</div>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => {

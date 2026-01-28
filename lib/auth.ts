@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
-export type UserRole = "admin" | "member" | "partner"
+export type UserRole = "admin" | "member" | "partner" | "directory_member"
 
 export interface UserProfile {
   id: string
@@ -80,24 +80,53 @@ export function canAccessFeature(profile: UserProfile | null, feature: string): 
 
   switch (feature) {
     case "virtual_mail":
-      return profile.has_virtual_mail
+      // Only paid members and admins
+      return profile.has_virtual_mail && (profile.role === "member" || profile.role === "admin")
     case "leads":
-      return profile.has_leads_access
+      // Only paid members and admins
+      return profile.has_leads_access && (profile.role === "member" || profile.role === "admin")
     case "directory":
+      // Everyone can view directory
       return profile.has_directory_listing
     case "bookings":
-      return profile.role === "member" || profile.role === "admin"
+      // Only paid members, partners, and admins
+      return profile.role === "member" || profile.role === "partner" || profile.role === "admin"
     case "perks":
-      return true // All authenticated users can view perks
+      // Everyone can VIEW perks, but restrictions on use handled in UI
+      return true
     case "community":
-      return true // All authenticated users can access community
+      // Everyone can view, but posting restricted
+      return true
+    case "community_post":
+      // Only paid members, partners, and admins can post
+      return profile.role === "member" || profile.role === "partner" || profile.role === "admin"
     case "events":
-      return true // All authenticated users can view events
+      // Everyone can view events
+      return true
     case "resources":
-      return true // All authenticated users can view resources
+      // Everyone can view resources
+      return true
     case "admin":
       return profile.role === "admin"
+    case "profile_edit":
+      // Everyone can edit their own profile
+      return true
     default:
       return false
+  }
+}
+
+export function getUpgradeMessage(feature: string): string {
+  switch (feature) {
+    case "bookings":
+      return "Upgrade to a Member or Partner account to book facilities"
+    case "virtual_mail":
+      return "Upgrade to access Virtual Office services"
+    case "leads":
+      return "Upgrade to receive exclusive trade leads"
+    case "community_post":
+      return "Upgrade to post in the community"
+    default:
+      return "Upgrade your membership to access this feature"
   }
 }
