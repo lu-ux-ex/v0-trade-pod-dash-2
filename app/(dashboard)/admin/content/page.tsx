@@ -66,6 +66,7 @@ interface Event {
   is_published: boolean
   visible_to_members: boolean
   visible_to_partners: boolean
+  visible_to_directory_members: boolean  // ADD THIS LINE
   created_at: string
 }
 
