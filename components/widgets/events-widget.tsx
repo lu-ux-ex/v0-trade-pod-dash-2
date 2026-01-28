@@ -1,14 +1,14 @@
 "use client"
 
 import React from "react"
-
 import { useState, useEffect } from "react"
-import { CalendarDays, MapPin, Users, Loader2 } from "lucide-react"
+import { CalendarDays, MapPin, Users, Loader2, Lock } from "lucide-react"
 import { WidgetCard } from "@/components/dashboard/widget-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
+import type { UserRole } from "@/lib/auth"
 
 interface Event {
   id: string
@@ -19,6 +19,10 @@ interface Event {
   location: string
   attendees: number
   max_capacity: number
+  is_published: boolean
+  visible_to_members: boolean
+  visible_to_partners: boolean
+  visible_to_directory_members: boolean
 }
 
 function formatDate(dateString: string) {
@@ -31,26 +35,54 @@ export function EventsWidget() {
   const [myRsvps, setMyRsvps] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [rsvpLoading, setRsvpLoading] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<UserRole | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
     async function loadData() {
       try {
-        // Load upcoming events
+        // Get user profile to check role
+        const { data: userData } = await supabase.auth.getUser()
+        if (!userData.user) {
+          setLoading(false)
+          return
+        }
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", userData.user.id)
+          .single()
+
+        const role = profile?.role as UserRole
+        setUserRole(role)
+
+        // Load events based on role and visibility
         const today = new Date().toISOString().split('T')[0]
-        const { data: eventsData } = await supabase
+        let query = supabase
           .from("events")
           .select("*")
-          .eq("is_published", true)
           .gte("event_date", today)
           .order("event_date", { ascending: true })
           .limit(3)
+
+        // Filter by role - admins see everything
+        if (role !== "admin") {
+          // Build visibility filter based on role
+          if (role === "member") {
+            query = query.eq("is_published", true).eq("visible_to_members", true)
+          } else if (role === "partner") {
+            query = query.eq("is_published", true).eq("visible_to_partners", true)
+          } else if (role === "directory_member") {
+            query = query.eq("is_published", true).eq("visible_to_directory_members", true)
+          }
+        }
         
+        const { data: eventsData } = await query
         setEvents(eventsData || [])
 
-        // Load user's RSVPs
-        const { data: userData } = await supabase.auth.getUser()
-        if (userData.user) {
+        // Load user's RSVPs (only for paid members)
+        if (role === "member" || role === "partner" || role === "admin") {
           const { data: rsvpData } = await supabase
             .from("event_attendees")
             .select("event_id")
@@ -70,6 +102,11 @@ export function EventsWidget() {
   const handleRsvp = async (eventId: string, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    
+    // Block directory members from RSVPing
+    if (userRole === "directory_member") {
+      return
+    }
     
     setRsvpLoading(eventId)
     try {
@@ -127,6 +164,8 @@ export function EventsWidget() {
       <div className="space-y-3">
         {events.map((event) => {
           const isRsvped = myRsvps.includes(event.id)
+          const isDirectoryMember = userRole === "directory_member"
+          
           return (
             <Link
               key={event.id}
@@ -141,6 +180,9 @@ export function EventsWidget() {
                       <Badge variant="outline" className="text-xs text-green-600 border-green-600">
                         RSVP'd
                       </Badge>
+                    )}
+                    {isDirectoryMember && (
+                      <Lock className="w-3 h-3 text-muted-foreground" />
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{event.description}</p>
@@ -161,21 +203,33 @@ export function EventsWidget() {
                     </span>
                   </div>
                 </div>
-                <Button
-                  variant={isRsvped ? "default" : "outline"}
-                  size="sm"
-                  className="shrink-0"
-                  onClick={(e) => handleRsvp(event.id, e)}
-                  disabled={rsvpLoading === event.id}
-                >
-                  {rsvpLoading === event.id ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                  ) : isRsvped ? (
-                    "Cancel"
-                  ) : (
-                    "RSVP"
-                  )}
-                </Button>
+                {isDirectoryMember ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0"
+                    disabled
+                  >
+                    <Lock className="w-3 h-3 mr-1" />
+                    Upgrade
+                  </Button>
+                ) : (
+                  <Button
+                    variant={isRsvped ? "default" : "outline"}
+                    size="sm"
+                    className="shrink-0"
+                    onClick={(e) => handleRsvp(event.id, e)}
+                    disabled={rsvpLoading === event.id}
+                  >
+                    {rsvpLoading === event.id ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : isRsvped ? (
+                      "Cancel"
+                    ) : (
+                      "RSVP"
+                    )}
+                  </Button>
+                )}
               </div>
             </Link>
           )
