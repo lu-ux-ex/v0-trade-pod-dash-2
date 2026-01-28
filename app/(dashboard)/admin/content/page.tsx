@@ -158,6 +158,7 @@ export default function ContentManagerPage() {
     end_time: "",
     location: "",
     capacity: 20,
+    visible_to_directory_members: false,
     event_type: "networking",
     is_published: true,
     visible_to_members: true,
