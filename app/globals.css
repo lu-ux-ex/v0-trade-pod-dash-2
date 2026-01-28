@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --font-sans: var(--font-inter);
+    --font-mono: var(--font-geist-mono);
+
+    /* TradePod Professional Theme - Light Mode */
+    --background: 30 20% 98%;
+    --foreground: 220 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    /* Primary - TradePod Orange */
+    --primary: 25 95% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Warm Gray */
+    --secondary: 30 10% 94%;
+    --secondary-foreground: 220 20% 25%;
+
+    /* Muted - Soft Warm Gray */
+    --muted: 30 15% 96%;
+    --muted-foreground: 220 10% 45%;
+
+    /* Accent - Deep Teal for trust */
+    --accent: 180 35% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 15% 90%;
+    --input: 30 15% 90%;
+    --ring: 25 95% 53%;
+
+    /* Chart colors */
+    --chart-1: 25 95% 53%;
+    --chart-2: 180 35% 45%;
+    --chart-3: 45 90% 55%;
+    --chart-4: 220 60% 55%;
+    --chart-5: 340 65% 55%;
+
+    --radius: 0.625rem;
+
+    /* Sidebar - Clean White */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 20% 25%;
+    --sidebar-primary: 25 95% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 30 15% 96%;
+    --sidebar-accent-foreground: 220 20% 15%;
+    --sidebar-border: 30 15% 92%;
+    --sidebar-ring: 25 95% 53%;
+
+    /* Custom TradePod tokens */
+    --success: 145 65% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 45 95% 50%;
+    --warning-foreground: 220 20% 15%;
+    --info: 205 80% 50%;
+    --info-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 220 20% 10%;
+    --foreground: 30 15% 95%;
+
+    --card: 220 18% 13%;
+    --card-foreground: 30 15% 95%;
+
+    --popover: 220 18% 13%;
+    --popover-foreground: 30 15% 95%;
+
+    --primary: 25 95% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 30 15% 90%;
+
+    --muted: 220 15% 18%;
+    --muted-foreground: 220 10% 55%;
+
+    --accent: 180 40% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 20%;
+    --input: 220 15% 20%;
+    --ring: 25 95% 55%;
+
+    --chart-1: 25 95% 55%;
+    --chart-2: 180 40% 50%;
+    --chart-3: 45 90% 60%;
+    --chart-4: 220 65% 60%;
+    --chart-5: 340 70% 60%;
+
+    --sidebar-background: 220 18% 12%;
+    --sidebar-foreground: 30 15% 90%;
+    --sidebar-primary: 25 95% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 18%;
+    --sidebar-accent-foreground: 30 15% 95%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 25 95% 55%;
+
+    --success: 145 60% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 45 90% 55%;
+    --warning-foreground: 220 20% 10%;
+    --info: 205 75% 55%;
+    --info-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
